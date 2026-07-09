@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <a href="{{ url_for('component_detail', comp_type=comp_type) }}" class="back-link">← Back to {{ info.title }}</a>
+</div>
+
+<div class="single-product-layout">
+  <div class="single-product-img-box">
+    <img src="{{ url_for('static', filename='images/' + product.image) if product.image else url_for('static', filename='images/placeholder.svg') }}"
+         alt="{{ product.name }}" class="single-product-img" onerror="this.src='{{ url_for('static', filename='images/placeholder.svg') }}'">
+    {% if product.is_rgb %}<div class="rgb-tag">✨ RGB</div>{% endif %}
+  </div>
+
+  <div class="single-product-info">
+    <div class="single-product-brand">{{ product.brand }}</div>
+    <h1>{{ product.name }}</h1>
+    <div class="single-product-price">₹{{ "{:,.0f}".format(product.price) }}</div>
+    {% if product.stock %}
+      <span class="stock-badge in-stock">✓ In Stock</span>
+    {% else %}
+      <span class="stock-badge out-of-stock-badge">✗ Out of Stock</span>
+    {% endif %}
+
+    <h3 class="spec-heading">Specifications</h3>
+    <table class="spec-table">
+      {% for key, val in product.get_specs().items() %}
+      <tr><td>{{ key.replace('_', ' ').title() }}</td><td>{{ val }}</td></tr>
+      {% endfor %}
+      {% if product.wattage %}<tr><td>Power Draw (TDP)</td><td>{{ product.wattage }}W</td></tr>{% endif %}
+    </table>
+
+    <div class="single-product-actions">
+      {% if product.stock %}
+        <a href="{{ url_for('buy_single_component', comp_type=product.type, comp_id=product.id) }}" class="btn btn-primary btn-full">🛒 Buy Now — ₹{{ "{:,.0f}".format(product.price) }}</a>
+      {% else %}
+        <button class="btn btn-disabled btn-full" disabled>Out of Stock</button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

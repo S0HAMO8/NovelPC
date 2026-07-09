@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Components{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>PC <span class="accent">Components</span></h1>
+  <p>Learn about each component and browse available products.</p>
+</div>
+
+<h2 class="group-heading group-heading-center">🖥️ Core PC Components</h2>
+<div class="component-grid">
+  {% set icons = {'cpu':'🔲','gpu':'🎮','motherboard':'🔌','ram':'🧠','ssd':'💾','hdd':'🗄️','psu':'⚡','cabinet':'🖥️','air_cooler':'🌬️','liquid_cooler':'❄️','fan':'🌀'} %}
+  {% set labels = {'cpu':'CPU','gpu':'GPU','motherboard':'Motherboard','ram':'RAM','ssd':'SSD','hdd':'HDD','psu':'PSU','cabinet':'Cabinet','air_cooler':'Air Cooling','liquid_cooler':'Liquid Cooling','fan':'Fans'} %}
+  {% for ct in types %}
+  <a href="{{ url_for('component_detail', comp_type=ct) }}" class="comp-card">
+    <div class="comp-icon">{{ icons.get(ct, '⚙️') }}</div>
+    <div class="comp-name">{{ labels.get(ct, ct.title()) }}</div>
+    <div class="comp-arrow">→</div>
+  </a>
+  {% endfor %}
+</div>
+
+<h2 class="group-heading group-heading-center">🎧 Accessories &amp; Peripherals</h2>
+<div class="component-grid">
+  {% set picons = {'monitor':'🖥️','keyboard':'⌨️','mouse':'🖱️','headphones':'🎧','earphones':'🎵','gaming_chair':'🪑','mousepad':'🟪'} %}
+  {% set plabels = {'monitor':'Monitor','keyboard':'Keyboard','mouse':'Mouse','headphones':'Headphones','earphones':'Earphones','gaming_chair':'Gaming Chair','mousepad':'Mouse Pad'} %}
+  {% for ct in peripheral_types %}
+  <a href="{{ url_for('component_detail', comp_type=ct) }}" class="comp-card">
+    <div class="comp-icon">{{ picons.get(ct, '⚙️') }}</div>
+    <div class="comp-name">{{ plabels.get(ct, ct.replace('_',' ').title()) }}</div>
+    <div class="comp-arrow">→</div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

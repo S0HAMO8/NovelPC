@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Admin Login{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo">🛠️</div>
+    <h2>Admin Login</h2>
+    <p class="auth-sub">Restricted access — store owner only</p>
+    <form method="POST" action="{{ url_for('admin_login') }}">
+      <div class="form-group">
+        <label>Admin Password</label>
+        <input type="password" name="password" placeholder="Enter admin password" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Login →</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

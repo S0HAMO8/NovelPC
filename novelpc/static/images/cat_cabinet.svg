@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#0b1018"/>
+  <rect x="70" y="20" width="100" height="200" rx="6" fill="#161e2c" stroke="#2d3f55" stroke-width="2"/>
+  <rect x="80" y="30" width="80" height="60" rx="3" fill="#0e1622" stroke="#2d3f55" stroke-width="1.5"/>
+  <circle cx="120" cy="60" r="22" fill="none" stroke="#00e5ff" stroke-width="2" opacity="0.6"/>
+  <circle cx="120" cy="60" r="22" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.3" stroke-dasharray="3,3"/>
+  <rect x="80" y="100" width="80" height="60" rx="3" fill="#0e1622" stroke="#2d3f55" stroke-width="1.5"/>
+  <circle cx="120" cy="130" r="22" fill="none" stroke="#bf5fff" stroke-width="2" opacity="0.6"/>
+  <rect x="80" y="170" width="80" height="35" rx="3" fill="#0e1622" stroke="#2d3f55" stroke-width="1.5"/>
+  <g fill="#3a4f6b"><rect x="90" y="180" width="60" height="4"/><rect x="90" y="190" width="60" height="4"/></g>
+  <rect x="65" y="10" width="4" height="200" fill="#1a2535"/>
+  <text x="120" y="232" text-anchor="middle" fill="#3a4f6b" font-family="monospace" font-size="9">PC CABINET</text>
+</svg>

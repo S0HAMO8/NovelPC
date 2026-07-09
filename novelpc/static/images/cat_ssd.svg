@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#0b1018"/>
+  <rect x="50" y="90" width="140" height="60" rx="4" fill="#161e2c" stroke="#2d3f55" stroke-width="2"/>
+  <rect x="58" y="98" width="60" height="20" rx="2" fill="#0e1622" stroke="#2d3f55" stroke-width="1"/>
+  <g fill="#3a4f6b">
+    <rect x="130" y="100" width="8" height="8"/><rect x="142" y="100" width="8" height="8"/>
+    <rect x="130" y="112" width="8" height="8"/><rect x="142" y="112" width="8" height="8"/>
+    <rect x="154" y="100" width="8" height="8"/><rect x="166" y="100" width="8" height="8"/>
+  </g>
+  <circle cx="175" cy="135" r="3" fill="#00e5ff"/>
+  <rect x="50" y="150" width="20" height="6" fill="#1a2535"/>
+  <text x="120" y="180" text-anchor="middle" fill="#5a7a9a" font-family="monospace" font-size="13" letter-spacing="1">NVMe SSD</text>
+  <text x="120" y="200" text-anchor="middle" fill="#3a4f6b" font-family="monospace" font-size="9">M.2 STORAGE</text>
+</svg>

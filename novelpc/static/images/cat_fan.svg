@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#0b1018"/>
+  <rect x="50" y="50" width="140" height="140" rx="8" fill="#161e2c" stroke="#2d3f55" stroke-width="2"/>
+  <circle cx="120" cy="120" r="60" fill="#0e1622" stroke="#2d3f55" stroke-width="2"/>
+  <circle cx="120" cy="120" r="60" fill="none" stroke="#bf5fff" stroke-width="2" opacity="0.5"/>
+  <g fill="#3a4f6b">
+    <ellipse cx="120" cy="85" rx="10" ry="28" transform="rotate(0 120 120)"/>
+    <ellipse cx="120" cy="85" rx="10" ry="28" transform="rotate(72 120 120)"/>
+    <ellipse cx="120" cy="85" rx="10" ry="28" transform="rotate(144 120 120)"/>
+    <ellipse cx="120" cy="85" rx="10" ry="28" transform="rotate(216 120 120)"/>
+    <ellipse cx="120" cy="85" rx="10" ry="28" transform="rotate(288 120 120)"/>
+  </g>
+  <circle cx="120" cy="120" r="10" fill="#1a2535" stroke="#00e5ff" stroke-width="1.5"/>
+  <circle cx="58" cy="58" r="3" fill="#3a4f6b"/><circle cx="182" cy="58" r="3" fill="#3a4f6b"/>
+  <circle cx="58" cy="182" r="3" fill="#3a4f6b"/><circle cx="182" cy="182" r="3" fill="#3a4f6b"/>
+  <text x="120" y="215" text-anchor="middle" fill="#3a4f6b" font-family="monospace" font-size="9">CASE FAN</text>
+</svg>

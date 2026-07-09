@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+{% block title %}PC Builder{% endblock %}
+
+{% block content %}
+<div class="builder-header">
+  <h1>⚡ PC <span class="accent">Builder</span></h1>
+  <p>Select components to build your custom gaming rig.</p>
+</div>
+
+<!-- AI Build Advisor -->
+<div class="advisor-box">
+  <h3>🤖 Build Advisor</h3>
+  <p class="advisor-sub">Tell us your budget and primary use — we'll auto-pick (and upgrade where possible) a complete build for you.</p>
+  <div class="advisor-form">
+    <select id="advisor-usecase">
+      <option value="gaming">Gaming</option>
+      <option value="editing">Video Editing</option>
+      <option value="streaming">Streaming</option>
+      <option value="office">Office / Everyday Use</option>
+    </select>
+    <input type="number" id="advisor-budget" placeholder="Budget in ₹ (e.g. 80000)" min="1000">
+    <button class="btn btn-primary" onclick="runAdvisor()">✨ Suggest Build</button>
+  </div>
+  <div id="advisor-results" class="advisor-results hidden"></div>
+</div>
+
+<div class="builder-layout">
+
+  <!-- LEFT: 2D Visual + Compatibility + Price -->
+  <div class="builder-left">
+
+    <!-- 2D Motherboard / Cabinet SVG -->
+    <div class="visual-box">
+      <h3>🖥️ Build Visualizer</h3>
+      <svg id="pc-svg" viewBox="0 0 320 420" xmlns="http://www.w3.org/2000/svg">
+        <!-- Cabinet outline -->
+        <rect x="5" y="5" width="310" height="410" rx="12" fill="#0d1117" stroke="#00e5ff" stroke-width="2" id="cabinet-outline"/>
+        <rect x="5" y="5" width="310" height="30" rx="12" fill="#00e5ff22" id="cabinet-top"/>
+        <text x="160" y="26" text-anchor="middle" fill="#00e5ff" font-size="12" font-family="Orbitron,sans-serif" id="cabinet-label">PC CABINET</text>
+
+        <!-- Motherboard base (size/shape changes via JS) -->
+        <rect id="mb-rect" x="20" y="50" width="185" height="230" rx="6" fill="#0a1628" stroke="#1e3a5f" stroke-width="1.5"/>
+        <text x="112" y="68" text-anchor="middle" fill="#3a6fa0" font-size="9" font-family="Rajdhani,sans-serif" id="mb-label">MOTHERBOARD</text>
+
+        <!-- CPU slot -->
+        <g id="slot-cpu" class="pc-slot">
+          <rect x="35" y="75" width="70" height="70" rx="4" fill="#111c2e" stroke="#1e3a5f" stroke-width="1.5"/>
+          <text x="70" y="107" text-anchor="middle" fill="#3a6fa0" font-size="9" font-family="Rajdhani,sans-serif">CPU</text>
+          <text x="70" y="120" text-anchor="middle" fill="#3a6fa0" font-size="8" font-family="Rajdhani,sans-serif">SOCKET</text>
+        </g>
+
+        <!-- Cooling overlay (over CPU) -->
+        <g id="slot-cooling" class="pc-slot cooling-slot">
+          <rect x="30" y="70" width="80" height="80" rx="4" fill="none" stroke="transparent" stroke-width="1"/>
+        </g>
+
+        <!-- RAM slots: 2, 4 or 8 depending on motherboard, drawn dynamically -->
+        <g id="slot-ram" class="pc-slot"></g>
+
+        <!-- GPU slot -->
+        <g id="slot-gpu" class="pc-slot">
+          <rect x="30" y="225" width="160" height="40" rx="3" fill="#111c2e" stroke="#1e3a5f" stroke-width="1.5" id="gpu-rect"/>
+          <text x="110" y="250" text-anchor="middle" fill="#3a6fa0" font-size="9" font-family="Rajdhani,sans-serif" id="gpu-static-label">GPU / PCIe SLOT</text>
+        </g>
+
+        <!-- Storage area: SSD -->
+        <g id="slot-ssd" class="pc-slot">
+          <rect x="30" y="170" width="68" height="45" rx="3" fill="#111c2e" stroke="#1e3a5f" stroke-width="1.5"/>
+          <text x="64" y="190" text-anchor="middle" fill="#3a6fa0" font-size="8" font-family="Rajdhani,sans-serif">SSD</text>
+          <text x="64" y="202" text-anchor="middle" fill="#3a6fa0" font-size="6.5" font-family="Rajdhani,sans-serif">M.2 SLOT</text>
+        </g>
+
+        <!-- Storage area: HDD (beside SSD) -->
+        <g id="slot-hdd" class="pc-slot">
+          <rect x="102" y="170" width="68" height="45" rx="3" fill="#111c2e" stroke="#1e3a5f" stroke-width="1.5"/>
+          <text x="136" y="190" text-anchor="middle" fill="#3a6fa0" font-size="8" font-family="Rajdhani,sans-serif">HDD</text>
+          <text x="136" y="202" text-anchor="middle" fill="#3a6fa0" font-size="6.5" font-family="Rajdhani,sans-serif">3.5" BAY</text>
+        </g>
+
+        <!-- Fan box: same height as motherboard, sits in the empty right-side gap. Holds up to 8 fans. -->
+        <rect id="fan-box-rect" x="215" y="50" width="90" height="230" rx="6" fill="#0a1628" stroke="#1e3a5f" stroke-width="1.5"/>
+        <text x="260" y="68" text-anchor="middle" fill="#3a6fa0" font-size="9" font-family="Rajdhani,sans-serif" id="fan-box-label">FANS</text>
+        <!-- Cabinet fan zones: dynamically drawn by JS based on quantity selected (max 8) -->
+        <g id="slot-fan" class="pc-slot"></g>
+
+        <!-- PSU bay (bottom) -->
+        <g id="slot-psu" class="pc-slot">
+          <rect x="20" y="305" width="285" height="80" rx="6" fill="#0a1420" stroke="#1e3a5f" stroke-width="1.5"/>
+          <text x="162" y="350" text-anchor="middle" fill="#3a6fa0" font-size="10" font-family="Rajdhani,sans-serif">PSU — POWER SUPPLY</text>
+        </g>
+
+        <!-- Labels for filled states -->
+        <text id="lbl-cpu"     x="70"  y="110" text-anchor="middle" fill="#00e5ff" font-size="8" font-family="Rajdhani,sans-serif" class="slot-label" visibility="hidden"></text>
+        <text id="lbl-gpu"     x="110" y="247" text-anchor="middle" fill="#ff6b35" font-size="8" font-family="Rajdhani,sans-serif" class="slot-label" visibility="hidden"></text>
+        <text id="lbl-ssd"     x="64"  y="190" text-anchor="middle" fill="#bf5fff" font-size="6.5" font-family="Rajdhani,sans-serif" class="slot-label" visibility="hidden"></text>
+        <text id="lbl-hdd"     x="136" y="190" text-anchor="middle" fill="#ff9a3a" font-size="6.5" font-family="Rajdhani,sans-serif" class="slot-label" visibility="hidden"></text>
+        <text id="lbl-psu"     x="162" y="347" text-anchor="middle" fill="#ffd700" font-size="8" font-family="Rajdhani,sans-serif" class="slot-label" visibility="hidden"></text>
+        <text id="lbl-cooling" x="70"  y="80"  text-anchor="middle" fill="#00bcd4" font-size="7" font-family="Rajdhani,sans-serif" class="slot-label" visibility="hidden"></text>
+        <text id="lbl-cabinet" x="160" y="40"  text-anchor="middle" fill="#39ff14" font-size="7" font-family="Rajdhani,sans-serif" class="slot-label" visibility="hidden"></text>
+        <text id="lbl-mb"      x="112" y="56"  text-anchor="middle" fill="#39ff14" font-size="7" font-family="Rajdhani,sans-serif" class="slot-label" visibility="hidden"></text>
+        <text id="lbl-fanbox" x="260" y="280" text-anchor="middle" fill="#00e5ff" font-size="6.5" font-family="Rajdhani,sans-serif" class="slot-label" visibility="hidden"></text>
+      </svg>
+    </div>
+
+    <!-- Price Tracker -->
+    <div class="price-box">
+      <h3>💰 Build Cost</h3>
+      <div class="price-breakdown" id="price-breakdown">
+        <div class="price-empty">No components selected yet.</div>
+      </div>
+      <div class="price-total">
+        Total: <span id="price-total">₹0</span>
+      </div>
+    </div>
+
+    <!-- Compatibility Panel -->
+    <div class="compat-box">
+      <h3>🔧 Compatibility Check</h3>
+      <div id="compat-results">
+        <p class="compat-pending">Add components to see compatibility results.</p>
+      </div>
+    </div>
+
+    <!-- Build Actions -->
+    <div class="build-actions">
+      <button onclick="saveBuild()" class="btn btn-outline">💾 Save Build</button>
+      <button onclick="confirmBuild()" class="btn btn-primary">🛒 Confirm Build</button>
+    </div>
+    <div class="build-actions">
+      <button onclick="resetBuild()" class="btn btn-danger-outline btn-full">↺ Reset Build</button>
+    </div>
+    <p class="autosave-note" id="autosave-note"></p>
+  </div>
+
+  <!-- RIGHT: Component Selector -->
+  <div class="builder-right">
+    <div class="tabs">
+      {% set tab_icons = {'cpu':'🔲','gpu':'🎮','motherboard':'🔌','ram':'🧠','ssd':'💾','hdd':'🗄️','psu':'⚡','cabinet':'🖥️','air_cooler':'🌬️','liquid_cooler':'❄️','fan':'🌀'} %}
+      {% set tab_labels = {'air_cooler':'AIR COOL','liquid_cooler':'LIQUID COOL','fan':'FANS'} %}
+      {% for ct in all_components.keys() %}
+      <button class="tab-btn {% if loop.first %}active{% endif %}" onclick="switchTab('{{ ct }}')">
+        {{ tab_icons.get(ct, '⚙️') }} {{ tab_labels.get(ct, ct.upper()) }}
+      </button>
+      {% endfor %}
+    </div>
+
+    {% for ct, comps in all_components.items() %}
+    <div class="tab-content {% if not loop.first %}hidden{% endif %}" id="tab-{{ ct }}">
+      <div class="tab-header">
+        <h3>{{ ct.replace('_', ' ').title() }} Options</h3>
+        <div class="filter-bar">
+          <select onchange="sortComponentCards('{{ ct }}', this.value)">
+            <option value="default">Sort: Default</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="brand">Company Name</option>
+            <option value="performance">Performance</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Scoped search for this tab -->
+      <div data-search-slot="{{ ct }}" style="margin-bottom:1rem;">
+        <div style="display:flex; gap:0.5rem;">
+          <input class="slot-search-input" type="text"
+            placeholder="Search {{ ct | replace('_',' ') | title }}s..."
+            autocomplete="off"
+            style="flex:1; padding:0.5rem 0.9rem; border-radius:8px;
+                   border:1px solid #444; background:#1e1e2e; color:#fff; font-size:0.95rem;" />
+          <button class="slot-search-clear"
+            style="padding:0.5rem 0.9rem; border-radius:8px; background:#555;
+                   color:#fff; border:none; cursor:pointer;">✕</button>
+        </div>
+        <div class="slot-search-warning"
+             style="display:none; margin-top:0.5rem; padding:0.6rem 0.9rem;
+                    background:#3a2a00; border-left:4px solid #f0a500;
+                    border-radius:6px; color:#f0c040; font-size:0.9rem;"></div>
+        <div class="slot-search-noresults"
+             style="display:none; margin-top:0.5rem; padding:0.6rem 0.9rem;
+                    background:#1a1a2e; border-left:4px solid #666;
+                    border-radius:6px; color:#aaa; font-size:0.9rem;">
+          No {{ ct | replace('_',' ') | title }}s found matching your search.
+        </div>
+      </div>
+      <div class="comp-card-list" id="list-{{ ct }}">
+      {% for comp in comps %}
+      <div class="comp-select-card {% if not comp.stock %}disabled-card{% endif %}" id="card-{{ comp.id }}"
+           data-id="{{ comp.id }}" data-type="{{ ct }}" data-price="{{ comp.price }}" data-name="{{ comp.name }}"
+           data-wattage="{{ comp.wattage }}" data-brand="{{ comp.brand }}" data-performance="{{ comp.performance_score }}"
+           data-ramslots="{{ comp.ram_slots }}" data-order="{{ loop.index }}" data-comp-id="{{ comp.id }}">
+        <img src="{{ url_for('static', filename='images/' + comp.image) if comp.image else url_for('static', filename='images/placeholder.svg') }}"
+             alt="{{ comp.name }}" class="comp-select-img" onerror="this.src='{{ url_for('static', filename='images/placeholder.svg') }}'">
+        <div class="comp-select-body">
+          <div class="comp-select-header">
+            <div>
+              <div class="comp-select-name">{{ comp.name }} {% if comp.is_rgb %}<span class="rgb-dot" title="RGB">✨</span>{% endif %}</div>
+              <div class="comp-select-brand">{{ comp.brand }}</div>
+            </div>
+            <div class="comp-select-right">
+              <div class="comp-select-price">₹{{ "{:,.0f}".format(comp.price) }}</div>
+              {% if comp.stock %}
+                <span class="stock-badge in-stock">✓ In Stock</span>
+              {% else %}
+                <span class="stock-badge out-of-stock-badge">✗ Out of Stock</span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="comp-select-specs">
+            {% for k, v in comp.specs.items() %}
+            <span class="spec-tag">{{ k.replace('_',' ').title() }}: {{ v }}</span>
+            {% endfor %}
+          </div>
+
+          {% if ct == 'ram' %}
+          <div class="ram-qty-row">
+            <label>Sticks to use:</label>
+            <select class="ram-qty-select" id="ramqty-{{ comp.id }}">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          {% endif %}
+
+          {% if ct == 'fan' %}
+          <div class="ram-qty-row">
+            <label>How many fans:</label>
+            <select class="ram-qty-select" id="fanqty-{{ comp.id }}">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+            </select>
+          </div>
+          {% endif %}
+
+          <div class="comp-select-actions">
+            <a href="{{ url_for('component_single', comp_type=comp.type, comp_id=comp.id) }}" class="btn btn-sm btn-outline">View Info</a>
+            {% if comp.stock %}
+              {% if ct == 'ram' %}
+                <button class="btn btn-sm btn-primary insert-btn" onclick="insertRam({{ comp.id }}, '{{ comp.name|replace("'","\\'")|replace('"','\\"') }}', {{ comp.price }}, {{ comp.wattage }})">+ Insert</button>
+              {% elif ct == 'fan' %}
+                <button class="btn btn-sm btn-primary insert-btn" onclick="insertFan({{ comp.id }}, '{{ comp.name|replace("'","\\'")|replace('"','\\"') }}', {{ comp.price }}, {{ comp.wattage }})">+ Insert</button>
+              {% else %}
+                <button class="btn btn-sm btn-primary insert-btn" onclick="insertComponent({{ comp.id }}, '{{ ct }}', '{{ comp.name|replace("'","\\'")|replace('"','\\"') }}', {{ comp.price }}, {{ comp.wattage }}, {{ comp.ram_slots }})">+ Insert</button>
+              {% endif %}
+            {% else %}
+              <button class="btn btn-sm btn-disabled" disabled>Out of Stock</button>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='builder.js') }}"></script>
+
+<script>
+function initSlotSearch(slotType) {
+  const wrapper = document.querySelector(`[data-search-slot="${slotType}"]`);
+  if (!wrapper) return;
+  const input         = wrapper.querySelector('.slot-search-input');
+  const warning       = wrapper.querySelector('.slot-search-warning');
+  const noRes         = wrapper.querySelector('.slot-search-noresults');
+  const listContainer = document.getElementById(`list-${slotType}`);
+  if (!listContainer) return;
+
+  let timer = null;
+
+  input.addEventListener('input', function () {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const q = this.value.trim();
+      warning.style.display = 'none';
+      noRes.style.display   = 'none';
+
+      if (!q) {
+        listContainer.querySelectorAll('[data-comp-id]').forEach(el => el.style.display = '');
+        return;
+      }
+
+      fetch(`/api/search_components?q=${encodeURIComponent(q)}&type=${slotType}`)
+        .then(r => r.json())
+        .then(data => {
+          const matchIds = new Set((data.results || []).map(c => String(c.id)));
+          let anyVisible = false;
+          listContainer.querySelectorAll('[data-comp-id]').forEach(el => {
+            const show = matchIds.has(el.dataset.compId);
+            el.style.display = show ? '' : 'none';
+            if (show) anyVisible = true;
+          });
+          if (data.cross_type_hint) {
+            warning.textContent = '⚠️ ' + data.cross_type_hint;
+            warning.style.display = 'block';
+          } else if (!anyVisible) {
+            noRes.style.display = 'block';
+          }
+        });
+    }, 300);
+  });
+
+  wrapper.querySelector('.slot-search-clear').addEventListener('click', function () {
+    input.value = '';
+    warning.style.display = 'none';
+    noRes.style.display   = 'none';
+    listContainer.querySelectorAll('[data-comp-id]').forEach(el => el.style.display = '');
+  });
+}
+
+// Runs for every tab — Jinja already made one search bar per tab above
+document.addEventListener('DOMContentLoaded', function () {
+  ['cpu','gpu','motherboard','ram','ssd','hdd','psu','cabinet',
+   'air_cooler','liquid_cooler','fan'].forEach(initSlotSearch);
+});
+</script>
+
+{% endblock %}

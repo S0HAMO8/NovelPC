@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#0b1018"/>
+  <rect x="75" y="35" width="90" height="90" rx="10" fill="#161e2c" stroke="#2d3f55" stroke-width="2"/>
+  <line x1="120" y1="40" x2="120" y2="120" stroke="#bf5fff" stroke-width="2" opacity="0.5"/>
+  <path d="M60,135 L70,165 L170,165 L180,135 Z" fill="#161e2c" stroke="#2d3f55" stroke-width="2"/>
+  <rect x="55" y="125" width="20" height="35" rx="5" fill="#161e2c" stroke="#2d3f55" stroke-width="1.5"/>
+  <rect x="165" y="125" width="20" height="35" rx="5" fill="#161e2c" stroke="#2d3f55" stroke-width="1.5"/>
+  <line x1="100" y1="165" x2="90" y2="205" stroke="#2d3f55" stroke-width="6"/>
+  <line x1="140" y1="165" x2="150" y2="205" stroke="#2d3f55" stroke-width="6"/>
+  <ellipse cx="120" cy="210" rx="40" ry="6" fill="#0e1622"/>
+  <text x="120" y="232" text-anchor="middle" fill="#3a4f6b" font-family="monospace" font-size="9">GAMING CHAIR</text>
+</svg>

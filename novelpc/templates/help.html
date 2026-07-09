@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Help &amp; Support{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>🛟 Help &amp; <span class="accent">Support</span></h1>
+  <p>Send us a message and we'll get back to you. You can also attach a screenshot if needed.</p>
+</div>
+
+<div class="help-layout">
+  <div class="help-form-box">
+    <h3>Submit a Ticket</h3>
+    <form method="POST" action="{{ url_for('help_page') }}" enctype="multipart/form-data">
+      <div class="form-group">
+        <label>Your Message</label>
+        <textarea name="message" rows="5" placeholder="Describe your issue or question..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label>Attach Image (optional)</label>
+        <input type="file" name="attachment" accept="image/*">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">📨 Submit Ticket</button>
+    </form>
+  </div>
+
+  <div class="help-history-box">
+    <h3>Your Past Tickets</h3>
+    {% if not tickets %}
+      <p class="empty-hint">No tickets submitted yet.</p>
+    {% endif %}
+    {% for t in tickets %}
+    <div class="ticket-card">
+      <div class="ticket-header">
+        <span class="ticket-status status-{{ t.status }}">{{ t.status.upper() }}</span>
+        <span class="ticket-date">{{ t.created_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+      </div>
+      <p class="ticket-msg">{{ t.message }}</p>
+      {% if t.attachment %}
+        <img src="{{ url_for('static', filename='uploads/' + t.attachment) }}" class="ticket-attachment" alt="attachment">
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

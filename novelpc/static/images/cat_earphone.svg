@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#0b1018"/>
+  <ellipse cx="95" cy="100" rx="18" ry="22" fill="#161e2c" stroke="#2d3f55" stroke-width="2"/>
+  <ellipse cx="145" cy="100" rx="18" ry="22" fill="#161e2c" stroke="#2d3f55" stroke-width="2"/>
+  <circle cx="95" cy="95" r="5" fill="#00e5ff" opacity="0.5"/>
+  <circle cx="145" cy="95" r="5" fill="#00e5ff" opacity="0.5"/>
+  <path d="M95,120 Q90,150 110,165 Q130,150 145,120" fill="none" stroke="#3a4f6b" stroke-width="2"/>
+  <line x1="110" y1="165" x2="120" y2="195" stroke="#3a4f6b" stroke-width="2"/>
+  <text x="120" y="220" text-anchor="middle" fill="#3a4f6b" font-family="monospace" font-size="9">EARPHONES</text>
+</svg>

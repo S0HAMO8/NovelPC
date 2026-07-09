@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#0b1018"/>
+  <rect x="40" y="40" width="160" height="160" rx="6" fill="#1a2535" stroke="#3a4f6b" stroke-width="2"/>
+  <rect x="60" y="60" width="120" height="120" rx="3" fill="#0e1622" stroke="#2a3f5b" stroke-width="1.5"/>
+  <g stroke="#c9a227" stroke-width="2">
+    <line x1="40" y1="55" x2="25" y2="55"/><line x1="40" y1="75" x2="25" y2="75"/>
+    <line x1="40" y1="95" x2="25" y2="95"/><line x1="40" y1="115" x2="25" y2="115"/>
+    <line x1="40" y1="135" x2="25" y2="135"/><line x1="40" y1="155" x2="25" y2="155"/>
+    <line x1="40" y1="175" x2="25" y2="175"/><line x1="40" y1="195" x2="25" y2="195"/>
+    <line x1="200" y1="55" x2="215" y2="55"/><line x1="200" y1="75" x2="215" y2="75"/>
+    <line x1="200" y1="95" x2="215" y2="95"/><line x1="200" y1="115" x2="215" y2="115"/>
+    <line x1="200" y1="135" x2="215" y2="135"/><line x1="200" y1="155" x2="215" y2="155"/>
+    <line x1="200" y1="175" x2="215" y2="175"/><line x1="200" y1="195" x2="215" y2="195"/>
+    <line x1="55" y1="40" x2="55" y2="25"/><line x1="75" y1="40" x2="75" y2="25"/>
+    <line x1="95" y1="40" x2="95" y2="25"/><line x1="115" y1="40" x2="115" y2="25"/>
+    <line x1="135" y1="40" x2="135" y2="25"/><line x1="155" y1="40" x2="155" y2="25"/>
+    <line x1="175" y1="40" x2="175" y2="25"/>
+    <line x1="55" y1="200" x2="55" y2="215"/><line x1="75" y1="200" x2="75" y2="215"/>
+    <line x1="95" y1="200" x2="95" y2="215"/><line x1="115" y1="200" x2="115" y2="215"/>
+    <line x1="135" y1="200" x2="135" y2="215"/><line x1="155" y1="200" x2="155" y2="215"/>
+    <line x1="175" y1="200" x2="175" y2="215"/>
+  </g>
+  <circle cx="80" cy="80" r="3" fill="#00e5ff"/>
+  <text x="120" y="125" text-anchor="middle" fill="#5a7a9a" font-family="monospace" font-size="14" letter-spacing="2">CPU</text>
+  <text x="120" y="145" text-anchor="middle" fill="#3a4f6b" font-family="monospace" font-size="9">PROCESSOR</text>
+</svg>

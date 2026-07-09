@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}{{ info.title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <a href="{{ url_for('components') }}" class="back-link">← Back to Components</a>
+  <h1>{{ info.title }}</h1>
+</div>
+
+<div class="detail-layout">
+  <div class="info-panel">
+    <div class="info-block">
+      <h3>📖 What is it?</h3>
+      <p>{{ info.definition }}</p>
+    </div>
+    <div class="info-block">
+      <h3>⚙️ How it works</h3>
+      <p>{{ info.how_it_works }}</p>
+    </div>
+    <div class="info-block">
+      <h3>🗂️ Types</h3>
+      <ul>{% for t in info.types %}<li>{{ t }}</li>{% endfor %}</ul>
+    </div>
+  </div>
+
+  <div class="products-panel">
+    <div class="filter-bar">
+      <label for="sort-select">Sort by:</label>
+      <select id="sort-select" onchange="sortProducts(this.value)">
+        <option value="default">Default</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="brand">Company Name (A-Z)</option>
+        <option value="performance">Performance (Best First)</option>
+      </select>
+    </div>
+
+    <!-- Scoped search bar -->
+    <div style="margin:1rem 0;">
+      <div style="display:flex; gap:0.5rem;">
+        <input type="text" id="scopedSearchInput"
+          placeholder="Search {{ comp_type | replace('_',' ') | title }}s..."
+          autocomplete="off"
+          style="flex:1; padding:0.55rem 1rem; border-radius:8px;
+                 border:1px solid #444; background:#1e1e2e; color:#fff; font-size:0.95rem;" />
+        <button onclick="clearSearch()"
+          style="padding:0.55rem 1rem; border-radius:8px; background:#555;
+                 color:#fff; border:none; cursor:pointer;">✕ Clear</button>
+      </div>
+      <div id="crossTypeWarning"
+           style="display:none; margin-top:0.6rem; padding:0.65rem 1rem;
+                  background:#3a2a00; border-left:4px solid #f0a500;
+                  border-radius:6px; color:#f0c040; font-size:0.9rem;"></div>
+      <div id="noResultsMsg"
+           style="display:none; margin-top:0.6rem; padding:0.65rem 1rem;
+                  background:#1e1e2e; border-left:4px solid #666;
+                  border-radius:6px; color:#aaa; font-size:0.9rem;">
+        No {{ comp_type | replace('_',' ') | title }}s found matching your search.
+      </div>
+    </div>
+
+    {% if rgb_products %}
+    <h2 class="group-heading">✨ RGB Components</h2>
+    <div class="product-list" id="rgb-list">
+      {% for product in rgb_products %}
+      {% include "_product_card.html" %}
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if non_rgb_products %}
+    <h2 class="group-heading">⬛ Non-RGB Components</h2>
+    <div class="product-list" id="nonrgb-list">
+      {% for product in non_rgb_products %}
+      {% include "_product_card.html" %}
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+// ── Sort — each list sorted independently so cards never leave their rgb/non-rgb group ──
+function sortProducts(criteria) {
+  ['rgb-list', 'nonrgb-list'].forEach(listId => {
+    const list = document.getElementById(listId);
+    if (!list) return;
+    // Only sort cards that are currently visible (not hidden by search)
+    const cards = Array.from(list.querySelectorAll('[data-comp-id]'));
+    cards.sort((a, b) => {
+      if (criteria === 'price-asc')   return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+      if (criteria === 'price-desc')  return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+      if (criteria === 'brand')       return a.dataset.brand.localeCompare(b.dataset.brand);
+      if (criteria === 'performance') return parseFloat(b.dataset.performance) - parseFloat(a.dataset.performance);
+      return parseFloat(a.dataset.order) - parseFloat(b.dataset.order);
+    });
+    // Re-append inside the same list — cards never cross the rgb/non-rgb boundary
+    cards.forEach(c => list.appendChild(c));
+  });
+}
+
+// ── Scoped search — hides non-matching cards, also hides group headings if empty ──
+(function () {
+  const CURRENT_TYPE = "{{ comp_type }}";
+  let timer = null;
+
+  document.getElementById('scopedSearchInput').addEventListener('input', function () {
+    clearTimeout(timer);
+    timer = setTimeout(() => runSearch(this.value.trim()), 300);
+  });
+
+  function runSearch(q) {
+    const warning   = document.getElementById('crossTypeWarning');
+    const noResults = document.getElementById('noResultsMsg');
+    warning.style.display   = 'none';
+    noResults.style.display = 'none';
+
+    if (!q) {
+      // Restore all cards and group headings
+      document.querySelectorAll('[data-comp-id]').forEach(el => el.style.display = '');
+      document.querySelectorAll('.group-heading').forEach(el => el.style.display = '');
+      document.querySelectorAll('#rgb-list, #nonrgb-list').forEach(el => el.style.display = '');
+      return;
+    }
+
+    fetch(`/api/search_components?q=${encodeURIComponent(q)}&type=${CURRENT_TYPE}`)
+      .then(r => r.json())
+      .then(data => {
+        const matchIds = new Set((data.results || []).map(c => String(c.id)));
+        let anyVisible = false;
+
+        // Show/hide individual cards
+        document.querySelectorAll('[data-comp-id]').forEach(el => {
+          const show = matchIds.has(el.dataset.compId);
+          el.style.display = show ? '' : 'none';
+          if (show) anyVisible = true;
+        });
+
+        // Hide the RGB heading + list if no RGB results, same for non-RGB
+        ['rgb-list', 'nonrgb-list'].forEach(listId => {
+          const list = list = document.getElementById(listId);
+          if (!list) return;
+          const hasVisible = Array.from(list.querySelectorAll('[data-comp-id]'))
+                                  .some(el => el.style.display !== 'none');
+          // The heading is the .group-heading immediately before the list
+          const heading = list.previousElementSibling;
+          list.style.display    = hasVisible ? '' : 'none';
+          if (heading && heading.classList.contains('group-heading')) {
+            heading.style.display = hasVisible ? '' : 'none';
+          }
+        });
+
+        if (data.cross_type_hint) {
+          warning.textContent = '⚠️ ' + data.cross_type_hint;
+          warning.style.display = 'block';
+        } else if (!anyVisible) {
+          noResults.style.display = 'block';
+        }
+      });
+  }
+
+  window.clearSearch = function () {
+    document.getElementById('scopedSearchInput').value = '';
+    document.getElementById('crossTypeWarning').style.display = 'none';
+    document.getElementById('noResultsMsg').style.display     = 'none';
+    document.querySelectorAll('[data-comp-id]').forEach(el => el.style.display = '');
+    document.querySelectorAll('.group-heading').forEach(el => el.style.display = '');
+    document.querySelectorAll('#rgb-list, #nonrgb-list').forEach(el => el.style.display = '');
+  };
+})();
+</script>
+{% endblock %}

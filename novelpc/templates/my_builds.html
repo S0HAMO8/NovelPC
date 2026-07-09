@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}My Builds{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>💾 My Saved <span class="accent">Builds</span></h1>
+  <p>Review, add to cart, or delete your saved configurations.</p>
+</div>
+
+<div class="builds-list">
+  {% if not items %}
+    <div class="empty-state">
+      <p>You haven't saved any builds yet.</p>
+      <a href="{{ url_for('builder') }}" class="btn btn-primary">Start Building →</a>
+    </div>
+  {% endif %}
+  {% for item in items %}
+  <div class="build-card">
+    <div class="build-card-header">
+      <div>
+        <h3>Build #{{ item.build.id }}</h3>
+        <span class="build-date">Saved on {{ item.build.created_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+      </div>
+      <div class="build-total">₹{{ "{:,.0f}".format(item.build.total_price) }}</div>
+    </div>
+    <div class="build-components">
+      {% for comp in item.components %}
+      <span class="build-comp-tag">{{ comp.type.replace('_',' ').upper() }}: {{ comp.name }}</span>
+      {% endfor %}
+    </div>
+    <div class="build-card-actions">
+      <form method="POST" action="{{ url_for('add_build_to_cart', build_id=item.build.id) }}" style="display:inline;">
+        <button type="submit" class="btn btn-primary btn-sm">🛒 Add to Cart &amp; Checkout</button>
+      </form>
+      <form method="POST" action="{{ url_for('delete_build', build_id=item.build.id) }}" style="display:inline;" onsubmit="return confirm('Delete this build?');">
+        <button type="submit" class="btn btn-danger-outline btn-sm">🗑️ Delete</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

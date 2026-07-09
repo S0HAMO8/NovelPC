@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
+  <rect width="240" height="240" fill="#0b1018"/>
+  <rect x="30" y="40" width="180" height="110" rx="6" fill="#161e2c" stroke="#2d3f55" stroke-width="2"/>
+  <rect x="42" y="52" width="156" height="86" rx="2" fill="#0a1a2a"/>
+  <rect x="42" y="52" width="156" height="86" fill="none" stroke="#00e5ff" stroke-width="1" opacity="0.4"/>
+  <path d="M90,52 L150,52 L130,138 L110,138 Z" fill="#0d2a3a" opacity="0.5"/>
+  <rect x="110" y="150" width="20" height="30" fill="#161e2c" stroke="#2d3f55" stroke-width="1.5"/>
+  <rect x="80" y="180" width="80" height="10" rx="3" fill="#161e2c" stroke="#2d3f55" stroke-width="1.5"/>
+  <text x="120" y="215" text-anchor="middle" fill="#3a4f6b" font-family="monospace" font-size="9">MONITOR</text>
+</svg>

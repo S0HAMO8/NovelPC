@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>🛠️ Admin <span class="accent">Dashboard</span></h1>
+  <a href="{{ url_for('admin_logout') }}" class="btn btn-outline btn-sm">Logout</a>
+</div>
+
+<div class="admin-stats">
+  <div class="stat-card"><div class="stat-num">{{ users|length }}</div><div class="stat-label">Users</div></div>
+  <div class="stat-card"><div class="stat-num">{{ orders|length }}</div><div class="stat-label">Orders</div></div>
+  <div class="stat-card"><div class="stat-num">{{ cancelled_orders|length }}</div><div class="stat-label">Cancelled</div></div>
+  <div class="stat-card"><div class="stat-num">{{ saved_builds|length }}</div><div class="stat-label">Saved Builds</div></div>
+  <div class="stat-card"><div class="stat-num">₹{{ "{:,.0f}".format(total_revenue) }}</div><div class="stat-label">Total Revenue</div></div>
+</div>
+
+<div class="admin-stats">
+  <div class="stat-card"><div class="stat-num">{{ total_visits }}</div><div class="stat-label">Total Page Visits</div></div>
+  <div class="stat-card"><div class="stat-num">{{ distinct_sessions }}</div><div class="stat-label">Unique Visitors</div></div>
+  <div class="stat-card"><div class="stat-num">{{ guest_visits_count }}</div><div class="stat-label">Guest (Not Logged In) Visits</div></div>
+</div>
+
+<div class="admin-section">
+  <h2>👤 Users</h2>
+  <table class="admin-table">
+    <tr><th>ID</th><th>Username</th><th>Email</th><th>Phone</th><th>Address</th><th>Joined</th></tr>
+    {% for u in users %}
+    <tr><td>{{ u.id }}</td><td>{{ u.username }}</td><td>{{ u.email }}</td><td>{{ u.phone or '—' }}</td><td>{{ u.address or '—' }}</td><td>{{ u.created_at.strftime('%d %b %Y') }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="admin-section">
+  <h2>📦 Orders</h2>
+  <table class="admin-table">
+    <tr><th>Order #</th><th>User</th><th>Total</th><th>Payment</th><th>Ordered On</th><th>Delivery By</th></tr>
+    {% for o in orders %}
+    <tr><td>{{ o.id }}</td><td>{{ o.user.username }}</td><td>₹{{ "{:,.0f}".format(o.total_price + (o.extras_price or 0)) }}</td><td>{{ o.payment_method or '—' }}</td><td>{{ o.created_at.strftime('%d %b %Y') }}</td><td>{{ o.delivery_date.strftime('%d %b %Y') if o.delivery_date else '—' }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="admin-section">
+  <h2>🚫 Cancelled Orders</h2>
+  {% if not cancelled_orders %}
+    <p class="empty-hint">No cancelled orders.</p>
+  {% else %}
+  <table class="admin-table">
+    <tr><th>Order #</th><th>User</th><th>Total</th><th>Ordered On</th><th>Cancelled On</th></tr>
+    {% for o in cancelled_orders %}
+    <tr><td>{{ o.id }}</td><td>{{ o.user.username }}</td><td>₹{{ "{:,.0f}".format(o.total_price + (o.extras_price or 0)) }}</td><td>{{ o.ordered_at.strftime('%d %b %Y') if o.ordered_at else '—' }}</td><td>{{ o.cancelled_at.strftime('%d %b %Y') if o.cancelled_at else '—' }}</td></tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+</div>
+
+<div class="admin-section">
+  <h2>💾 Saved Builds</h2>
+  <table class="admin-table">
+    <tr><th>Build #</th><th>User</th><th>Total</th><th>Date</th></tr>
+    {% for b in saved_builds %}
+    <tr><td>{{ b.id }}</td><td>{{ b.user.username }}</td><td>₹{{ "{:,.0f}".format(b.total_price) }}</td><td>{{ b.created_at.strftime('%d %b %Y') }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="admin-section">
+  <h2>🛟 Support Tickets</h2>
+  <table class="admin-table">
+    <tr><th>ID</th><th>User</th><th>Message</th><th>Status</th><th>Date</th></tr>
+    {% for t in tickets %}
+    <tr><td>{{ t.id }}</td><td>{{ t.user.username }}</td><td>{{ t.message[:60] }}{% if t.message|length > 60 %}...{% endif %}</td><td>{{ t.status }}</td><td>{{ t.created_at.strftime('%d %b %Y') }}</td></tr>
+    {% endfor %}
+  </table>
+</div>
+
+<div class="admin-section">
+  <h2>👣 Recent Site Activity (incl. Guests)</h2>
+  <p class="admin-hint">Shows the last 200 page visits across the whole site — logged-in users and anonymous guests alike.</p>
+  {% if not recent_visits %}
+    <p class="empty-hint">No activity recorded yet.</p>
+  {% else %}
+  <table class="admin-table">
+    <tr><th>Time</th><th>Page</th><th>Visitor</th><th>IP</th></tr>
+    {% for v in recent_visits %}
+    <tr>
+      <td>{{ v.visited_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+      <td>{{ v.path }}</td>
+      <td>{% if v.user_id %}User #{{ v.user_id }}{% if v.username %} ({{ v.username }}){% endif %}{% else %}<span class="guest-tag">Guest</span>{% endif %}</td>
+      <td>{{ v.ip_address or '—' }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+</div>
+{% endblock %}

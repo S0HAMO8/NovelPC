@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}My Orders{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>📦 My <span class="accent">Orders</span></h1>
+  <p>Track your placed orders.</p>
+</div>
+
+<div class="builds-list">
+  {% if not items and not cancelled_items %}
+    <div class="empty-state">
+      <p>You haven't placed any orders yet.</p>
+      <a href="{{ url_for('builder') }}" class="btn btn-primary">Build a PC →</a>
+    </div>
+  {% endif %}
+  {% for item in items %}
+  <div class="build-card order-card">
+    <div class="build-card-header">
+      <div>
+        <h3>Order #{{ item.build.id }}</h3>
+        <span class="build-date">Ordered on {{ item.build.created_at.strftime('%d %b %Y, %I:%M %p') }}</span>
+      </div>
+      <div class="build-total">₹{{ "{:,.0f}".format(item.build.total_price + (item.build.extras_price or 0)) }}</div>
+    </div>
+    <div class="order-status-badge">✅ {{ item.build.status.upper() }} — Sent to Assembly</div>
+    {% if item.build.delivery_date %}
+    <div class="order-delivery-badge">📅 Estimated Delivery: {{ item.build.delivery_date.strftime('%d %B %Y') }}</div>
+    {% endif %}
+    {% if item.build.payment_method %}
+    <div class="order-pay-method">Paid via {{ item.build.payment_method.upper() }}</div>
+    {% endif %}
+    {% if item.build.description %}
+    <div class="order-description">📝 {{ item.build.description }}</div>
+    {% endif %}
+    <div class="build-components">
+      {% for comp in item.components %}
+      <span class="build-comp-tag">{{ comp.type.replace('_',' ').upper() }}: {{ comp.name }}</span>
+      {% endfor %}
+    </div>
+    <div class="build-card-actions">
+      <a href="{{ url_for('download_invoice', build_id=item.build.id) }}" class="btn btn-outline btn-sm">🧾 Download Invoice</a>
+      {% if item.build.can_cancel() %}
+        <button class="btn btn-danger-outline btn-sm" onclick="cancelOrder({{ item.build.id }})">✖ Cancel Order</button>
+      {% else %}
+        <button class="btn btn-disabled btn-sm" disabled title="Orders can only be cancelled within 3 days of placing them">Cancellation window passed</button>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+
+  {% if cancelled_items %}
+  <h2 class="group-heading">🚫 Cancelled Orders</h2>
+  {% for item in cancelled_items %}
+  <div class="build-card order-card cancelled-card">
+    <div class="build-card-header">
+      <div>
+        <h3>Order #{{ item.build.id }} <span class="cancelled-tag">CANCELLED</span></h3>
+        <span class="build-date">Ordered on {{ item.build.created_at.strftime('%d %b %Y, %I:%M %p') }}{% if item.build.cancelled_at %}, cancelled on {{ item.build.cancelled_at.strftime('%d %b %Y') }}{% endif %}</span>
+      </div>
+      <div class="build-total">₹{{ "{:,.0f}".format(item.build.total_price + (item.build.extras_price or 0)) }}</div>
+    </div>
+    <div class="build-components">
+      {% for comp in item.components %}
+      <span class="build-comp-tag">{{ comp.type.replace('_',' ').upper() }}: {{ comp.name }}</span>
+      {% endfor %}
+    </div>
+    <div class="build-card-actions">
+      <a href="{{ url_for('download_invoice', build_id=item.build.id) }}" class="btn btn-outline btn-sm">🧾 Download Invoice</a>
+    </div>
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+
+<script>
+async function cancelOrder(buildId) {
+  if (!confirm('Are you sure you want to cancel this order? This cannot be undone.')) return;
+  try {
+    const res = await fetch(`/order/${buildId}/cancel`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      alert(data.message);
+      window.location.reload();
+    } else {
+      alert(data.message || "You can't cancel this order now.");
+    }
+  } catch (e) {
+    alert('Something went wrong. Please try again.');
+  }
+}
+</script>
+{% endblock %}

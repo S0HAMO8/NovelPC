@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">🎮 Ultimate PC Building Tool</div>
+    <h1 class="hero-title">Build Your<br><span class="accent">Dream PC</span></h1>
+    <p class="hero-sub">Select components, check compatibility, and configure the perfect gaming PC — all in one place.</p>
+    <div class="hero-actions">
+      <a href="{{ url_for('components') }}" class="btn btn-outline">🔍 View Components</a>
+      {% if session.get('user_id') %}
+        <a href="{{ url_for('builder') }}" class="btn btn-primary">⚡ Build Your PC</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-primary">⚡ Build Your PC</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <h2 class="section-title">Why <span class="accent">novelPC</span>?</h2>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🧩</div>
+      <h3>Smart Compatibility</h3>
+      <p>Automatic checks for RAM type, form factor, GPU fit, and PSU wattage — no guesswork.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🤖</div>
+      <h3>Build Advisor</h3>
+      <p>Tell us your budget and use-case — we'll suggest a complete, optimized build for you.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🖥️</div>
+      <h3>2D Visual Builder</h3>
+      <p>Interactive motherboard and cabinet view shows your build coming together.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">📦</div>
+      <h3>Save, Cart & Order</h3>
+      <p>Save builds, add them to your cart, and checkout with simulated card or UPI payment.</p>
+    </div>
+  </div>
+</section>
+{% endblock %}

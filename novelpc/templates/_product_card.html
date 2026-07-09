@@ -1,0 +1,38 @@
+<div class="product-card {{ 'out-of-stock' if not product.stock }}"
+     data-price="{{ product.price }}" data-brand="{{ product.brand }}"
+     data-performance="{{ product.performance_score }}" data-order="{{ product.id }}"
+     data-comp-id="{{ product.id }}" data-rgb="{{ 'true' if product.is_rgb else 'false' }}">
+  <div class="product-img-wrap">
+    <img src="{{ url_for('static', filename='images/' + product.image) if product.image else url_for('static', filename='images/placeholder.svg') }}"
+         alt="{{ product.name }}" class="product-img" onerror="this.src='{{ url_for('static', filename='images/placeholder.svg') }}'">
+  </div>
+  <div class="product-body">
+    <div class="product-header">
+      <div>
+        <div class="product-name">{{ product.name }}</div>
+        <div class="product-brand">{{ product.brand }}</div>
+      </div>
+      <div class="product-right">
+        <div class="product-price">₹{{ "{:,.0f}".format(product.price) }}</div>
+        {% if product.stock %}
+          <span class="stock-badge in-stock">✓ In Stock</span>
+        {% else %}
+          <span class="stock-badge out-of-stock-badge">✗ Out of Stock</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="product-specs">
+      {% for key, val in product.get_specs().items() %}
+        <span class="spec-tag">{{ key.replace('_', ' ').title() }}: {{ val }}</span>
+      {% endfor %}
+    </div>
+    <div class="product-actions">
+      <a href="{{ url_for('component_single', comp_type=product.type, comp_id=product.id) }}" class="btn btn-sm btn-outline">View Info</a>
+      {% if product.stock %}
+        <a href="{{ url_for('buy_single_component', comp_type=product.type, comp_id=product.id) }}" class="btn btn-sm btn-primary">🛒 Buy Now</a>
+      {% else %}
+        <button class="btn btn-sm btn-disabled" disabled>Out of Stock</button>
+      {% endif %}
+    </div>
+  </div>
+</div>
